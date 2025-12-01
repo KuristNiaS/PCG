@@ -29,26 +29,53 @@ def get_db():
 
 # ---------------- API ----------------
 
-@app.get("/api/search")
-def search(q: str = None, limit: int = 50, db=Depends(get_db)):
-    c = db.cursor()
-    if q:
-        q_like = f"%{q}%"
-        c.execute("""
-            SELECT id, name, color, eff, cost, PP, DP
-            FROM card
-            WHERE name LIKE ? OR eff LIKE ? OR color LIKE ?
-            LIMIT ?
-        """, (q_like, q_like, q_like, limit))
-    else:
-        c.execute("""
-            SELECT id, name, color, eff, cost, PP, DP
-            FROM card
-            LIMIT ?
-        """, (limit,))
+from typing import Optional
+from fastapi import Query
 
+@app.get("/api/search")
+def search(
+    q: Optional[str] = None,
+    series: Optional[str] = None,
+    color: Optional[str] = None,
+    min_cost: Optional[int] = None,
+    max_cost: Optional[int] = None,
+    min_PP: Optional[int] = None,
+    max_PP: Optional[int] = None,
+    limit: int = 50,
+    offset: int = 0,
+    db=Depends(get_db)
+):
+    sql = "SELECT id, name, color, eff, cost, PP, DP, image_url FROM card"
+    where = []
+    params = []
+    if q:
+        where.append("(name LIKE ? OR eff LIKE ?)")
+        qlike = f"%{q}%"
+        params.extend([qlike, qlike])
+    if series:
+        where.append("series = ?")
+        params.append(series)
+    if color:
+        where.append("color = ?")
+        params.append(color)
+    if min_cost is not None:
+        where.append("cost >= ?"); params.append(min_cost)
+    if max_cost is not None:
+        where.append("cost <= ?"); params.append(max_cost)
+    if min_PP is not None:
+        where.append("PP >= ?"); params.append(min_PP)
+    if max_PP is not None:
+        where.append("PP <= ?"); params.append(max_PP)
+
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+    sql += " ORDER BY id DESC LIMIT ? OFFSET ?"
+    params.extend([limit, offset])
+    c = db.cursor()
+    c.execute(sql, params)
     rows = c.fetchall()
     return [dict(r) for r in rows]
+
 
 
 @app.get("/api/card/{card_id}")
