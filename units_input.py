@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox
 import sqlite3
 import json
 import os
+#test
 
 DB_PATH = "data/cards/eff/cards.db"
 
