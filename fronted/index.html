@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PCG 卡查</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .card { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h2>PCG 卡片搜索</h2>
+
+  <input id="q" placeholder="输入名称/效果/颜色搜索..." style="width: 300px; padding: 6px;">
+  <button onclick="doSearch()">搜索</button>
+
+  <div id="results"></div>
+
+<script>
+const apiBase = "http://localhost:8000/api"; 
+// ⚠ 部署后改成：
+// const apiBase = "https://你的后端域名/api";
+
+async function doSearch() {
+  const q = document.getElementById("q").value.trim();
+  const res = await fetch(`${apiBase}/search?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  const results = document.getElementById("results");
+  results.innerHTML = "";
+
+  if (!data.length) {
+    results.innerHTML = "<p>无结果</p>";
+    return;
+  }
+
+  data.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <strong>${c.id} | ${c.name}</strong><br>
+      颜色：${c.color ?? "-"}<br>
+      费用：${c.cost ?? "-"}<br>
+      PP/DP：${c.PP}/${c.DP}<br>
+      <pre>${c.eff ?? ""}</pre>
+    `;
+    results.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
