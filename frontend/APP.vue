@@ -107,6 +107,24 @@
             </v-row>
           </v-col>
         </v-row>
+        <!-- Footer 声明区域 -->
+        <div class="footer">
+          <p class="footer-text">
+            PCG-wiki 是一个非官方粉丝工具，所有卡牌资料版权归集卡社所有，
+            本网站与集卡社并无任何官方合作或授权关系。
+          </p>
+
+          <p class="footer-text">
+            © 2025 PCG-wiki. All rights reserved.
+            <a href="https://your-feedback-link" target="_blank" class="footer-link">｜问题反馈</a>
+          </p>
+
+          <div class="footer-dev">
+            <v-icon class="footer-icon" size="20">mdi-github</v-icon>
+            <span>Developed by </span>
+            <a href="https://github.com/KuristNiaS" class="footer-link" target="_blank">KuristNiaS</a>
+          </div>
+        </div>
       </v-container>
     </v-main>
 
@@ -328,6 +346,8 @@ export default {
 }
 </script>
 
+
+
 <style scoped>
 .v-card { cursor: pointer; }
 
@@ -352,5 +372,40 @@ export default {
     width: calc(50% - 8px);
   }
 }
+
+.footer {
+  margin-top: 40px;
+  padding: 32px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-text {
+  margin: 4px 0;
+}
+
+.footer-dev {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.footer-icon {
+  opacity: 0.8;
+}
+
 
 </style>
