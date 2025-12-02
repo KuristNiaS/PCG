@@ -407,5 +407,8 @@ export default {
   opacity: 0.8;
 }
 
+.v-application {
+  background-color: #121212 !important;
+}
 
 </style>
