@@ -116,7 +116,7 @@
 
           <p class="footer-text">
             © 2025 PCG-wiki. All rights reserved.
-            <a href="https://your-feedback-link" target="_blank" class="footer-link">｜问题反馈</a>
+            <a href="mailto: sj-nick@foxmail.com" target="_blank" class="footer-link">｜问题反馈</a>
           </p>
 
           <div class="footer-dev">
