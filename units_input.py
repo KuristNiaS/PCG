@@ -427,7 +427,7 @@ class CardManagerApp:
         
         for r in rows:
             card_data = dict(zip(keys, r))
-            card_data["image_path"] = f"/frontend/public/images/{card_data['id']}.jpg"
+            card_data["image_path"] = f"/public/images/{card_data['id']}.jpg"
             cards.append(card_data)
 
         try:

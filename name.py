@@ -1,30 +1,18 @@
+from PIL import Image
 import os
-from datetime import datetime
 
-# 图片所在目录
-folder = r"\frontend\public\images"  # 修改为你的路径
+folder ="frontend/public/images"
 
-# 允许的图片格式
-exts = [".jpg", ".jpeg", ".png", ".bmp", ".webp"]
+for filename in os.listdir(folder):
+    if filename.lower().endswith(".png"):
+        png_path = os.path.join(folder, filename)
+        jpg_path = os.path.join(folder, filename[:-4] + ".jpg")
 
-# 获取所有图片文件
-files = [f for f in os.listdir(folder) if os.path.splitext(f)[1].lower() in exts]
+        try:
+            img = Image.open(png_path).convert("RGB")
+            img.save(jpg_path, "JPEG", quality=95)
+            print(f"Converted: {png_path} -> {jpg_path}")
+        except Exception as e:
+            print(f"Failed: {png_path}, {e}")
 
-# 获取文件完整路径，并按照修改时间排序
-files_sorted = sorted(files, key=lambda f: os.path.getmtime(os.path.join(folder, f)))
-
-# 只取最新的42张
-latest_42 = files_sorted[-42:]
-
-# 三组命名前缀
-prefixes = ["ST01", "ST03", "ST04"]
-
-index = 0
-for prefix in prefixes:
-    for i in range(14):
-        old_name = latest_42[index]
-        new_name = f"{prefix}-{i+1:03d}{os.path.splitext(old_name)[1].lower()}"
-        os.rename(os.path.join(folder, old_name), os.path.join(folder, new_name))
-        index += 1
-
-print("重命名完成！")
+print("✔ PNG → JPG conversion completed!")
