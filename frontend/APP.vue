@@ -1,102 +1,105 @@
 <template>
   <v-app>
-    <v-app-bar flat color="white">
+    <v-app-bar flat color="white" app> <!-- 添加app属性解决遮挡问题 -->
       <v-toolbar-title>PCG 卡查 </v-toolbar-title>
       <v-spacer />
-      <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
+      <!-- 已移除API文本显示 -->
     </v-app-bar>
 
-    <v-container fluid>
-      <v-row>
-        <!-- filters -->
-        <v-col cols="12" md="3">
-          <v-card outlined>
-            <v-card-text>
-              <v-text-field v-model="q" label="关键词（名称/效果）" dense @input="onFilterDebounced" />
-              <v-select :items="seriesOptions" v-model="filterSeries" label="系列" dense clearable />
-              <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
-              
-              <div class="my-2">类别（多选）</div>
-              <div>
-                <v-chip-group multiple column>
-                  <v-chip
-                    v-for="c in categoryOptions"
-                    :key="c"
-                    :value="c"
-                    @click="toggleChip(c)"
-                    :color="selectedCats.includes(c) ? 'primary' : ''"
-                    :text-color="selectedCats.includes(c) ? 'white' : ''"
-                    outlined
-                    >
-                    {{ c }}
-                  </v-chip>
-                </v-chip-group>
-              </div>
+    <!-- 添加v-main包裹内容，解决导航栏遮挡问题 -->
+    <v-main>
+      <v-container fluid>
+        <v-row>
+          <!-- filters -->
+          <v-col cols="12" md="3">
+            <v-card outlined>
+              <v-card-text>
+                <v-text-field v-model="q" label="关键词（名称/效果）" dense @input="onFilterDebounced" />
+                <v-select :items="seriesOptions" v-model="filterSeries" label="系列" dense clearable />
+                <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
+                
+                <div class="my-2">类别（多选）</div>
+                <div>
+                  <v-chip-group multiple column>
+                    <v-chip
+                      v-for="c in categoryOptions"
+                      :key="c"
+                      :value="c"
+                      @click="toggleChip(c)"
+                      :color="selectedCats.includes(c) ? 'primary' : ''"
+                      :text-color="selectedCats.includes(c) ? 'white' : ''"
+                      outlined
+                      >
+                      {{ c }}
+                    </v-chip>
+                  </v-chip-group>
+                </div>
 
-              <v-row class="mt-3" dense>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minCost" label="费用 min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model.number="maxCost" label="费用 max" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-              </v-row>
+                <v-row class="mt-3" dense>
+                  <v-col cols="6">
+                    <v-text-field v-model.number="minCost" label="费用 min" dense type="number" @input="onFilterDebounced" />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model.number="maxCost" label="费用 max" dense type="number" @input="onFilterDebounced" />
+                  </v-col>
+                </v-row>
 
-              <v-row dense>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minPP" label="PP min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minDP" label="DP min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-              </v-row>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-text-field v-model.number="minPP" label="PP min" dense type="number" @input="onFilterDebounced" />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model.number="minDP" label="DP min" dense type="number" @input="onFilterDebounced" />
+                  </v-col>
+                </v-row>
 
-              <v-row class="mt-4" dense>
-                <v-col cols="6">
-                  <v-btn block @click="resetFilters" color="primary" text>重置</v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn block @click="exportJson" color="primary">导出JSON</v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
+                <v-row class="mt-4" dense>
+                  <v-col cols="6">
+                    <v-btn block @click="resetFilters" color="primary" text>重置</v-btn>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-btn block @click="exportJson" color="primary">导出JSON</v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
 
-        <!-- card grid -->
-        <v-col cols="12" md="9">
-          <v-row align="center" class="mb-2">
-            <v-col>
-              <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
-            </v-col>
-            <v-col class="d-flex" cols="6" md="3">
-              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
-            </v-col>
-          </v-row>
+          <!-- card grid -->
+          <v-col cols="12" md="9">
+            <v-row align="center" class="mb-2">
+              <v-col>
+                <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
+              </v-col>
+              <v-col class="d-flex" cols="6" md="3">
+                <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
+              </v-col>
+            </v-row>
 
-          <v-row>
-            <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
-              <v-card class="hoverable" @click="open(card)" outlined>
-                <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
-                  <template #placeholder>
-                    <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-progress-circular indeterminate color="grey lighten-1" />
-                    </v-row>
-                  </template>
-                </v-img>
-                <v-card-title class="text-no-wrap">{{ card.name }}</v-card-title>
-                <v-card-subtitle class="grey--text text--darken-1">
-                  {{ card.id }} · {{ card.product_series || card.series }} · {{ card.rarity }}
-                </v-card-subtitle>
-                <v-card-text class="py-2">
-                  <div class="caption">{{ card.category }}</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+            <v-row>
+              <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
+                <v-card class="hoverable" @click="open(card)" outlined>
+                  <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
+                    <template #placeholder>
+                      <v-row class="fill-height ma-0" align="center" justify="center">
+                        <v-progress-circular indeterminate color="grey lighten-1" />
+                      </v-row>
+                    </template>
+                  </v-img>
+                  <v-card-title class="text-no-wrap">{{ card.name }}</v-card-title>
+                  <v-card-subtitle class="grey--text text--darken-1">
+                    {{ card.id }} · {{ card.product_series || card.series }} · {{ card.rarity }}
+                  </v-card-subtitle>
+                  <v-card-text class="py-2">
+                    <div class="caption">{{ card.category }}</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
 
     <!-- modal -->
     <v-dialog v-model="dialog" max-width="900px">
@@ -109,8 +112,9 @@
         <v-card-text>
           <v-row>
             <v-col cols="12" md="5">
+              <!-- 修复图片不显示问题，使用selectedCard -->
               <v-img 
-              :src="imageUrl(card)" 
+              :src="imageUrl(selectedCard)" 
               aspect-ratio="450/629" 
               max-width="450"       
               cover
@@ -147,8 +151,6 @@ import { computed, onMounted, ref } from 'vue';
 */
 const apiBase = 'https://pcg-fga3.onrender.com/api' // ← 改成后端地址
 const imagesBase = 'https://pcg-wiki.vercel.app/images' // ← 改成图片目录 URL
-
-//test
 
 export default {
   setup() {
@@ -283,16 +285,14 @@ export default {
       const a = document.createElement('a'); a.href = url; a.download = 'cards_export.json'; a.click(); URL.revokeObjectURL(url)
     }
 
-    // debounce for input
+    // 修复防抖函数定义错误
     let t
     function onFilterDebounced(){
-      function onFilterDebounced(){
       clearTimeout(t); 
       t = setTimeout(()=>{
-    // 触发过滤（计算属性会自动更新，这里可加日志或调试信息）
-      console.log("过滤条件更新");
+        // 触发过滤（计算属性会自动更新）
+        console.log("过滤条件更新");
       }, 150)
-    }
     }
 
     function sortAndRender(){ /* reactive via computed */ }
