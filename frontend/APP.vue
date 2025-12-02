@@ -1,312 +1,330 @@
 <template>
   <v-app>
-    <v-app-bar flat color="white">
-      <v-toolbar-title>PCG 卡查 </v-toolbar-title>
-      <v-spacer />
-      <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
-    </v-app-bar>1
+    <v-main>
+      <v-container fluid class="py-4">
+        <!-- 搜索栏 -->
+        <v-card class="mb-4">
+          <v-card-text>
+            <v-text-field
+              v-model="searchQuery"
+              label="搜索卡牌名称/效果"
+              placeholder="输入关键词..."
+              prepend-inner-icon="mdi-magnify"
+              @input="onFilterDebounced"
+            ></v-text-field>
+          </v-card-text>
+        </v-card>
 
-    <v-container fluid>
-      <v-row>
-        <!-- filters -->
-        <v-col cols="12" md="3">
-          <v-card outlined>
+        <!-- 筛选面板 -->
+        <v-card class="mb-4">
+          <v-card-title>筛选条件</v-card-title>
+          <v-card-text>
+            <v-row>
+              <!-- 系列筛选 -->
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="selectedSeries"
+                  label="选择系列"
+                  :items="seriesList"
+                  item-value="value"
+                  item-text="text"
+                  placeholder="全部系列"
+                  clearable
+                  @change="onFilterDebounced"
+                ></v-select>
+              </v-col>
+
+              <!-- 颜色筛选 -->
+              <v-col cols="12" md="4">
+                <v-checkbox-group
+                  v-model="selectedColors"
+                  label="选择颜色"
+                  @change="onFilterDebounced"
+                >
+                  <v-checkbox label="红" value="红"></v-checkbox>
+                  <v-checkbox label="蓝" value="蓝"></v-checkbox>
+                  <v-checkbox label="绿" value="绿"></v-checkbox>
+                  <v-checkbox label="黑" value="黑"></v-checkbox>
+                  <v-checkbox label="白" value="白"></v-checkbox>
+                </v-checkbox-group>
+              </v-col>
+            </v-row>
+
+            <!-- 滑块筛选：费用/PP/DP -->
+            <v-row class="mt-4">
+              <!-- 费用滑块 -->
+              <v-col cols="12" sm="4">
+                <div class="d-flex align-center">
+                  <v-slider
+                    v-model="costMin"
+                    label="费用最小值"
+                    :min="0"
+                    :max="sliderMax.cost"
+                    step="1"
+                    show-ticks
+                    ticks="always"
+                    hide-details="auto"
+                    class="flex-grow-1"
+                    @change="onFilterDebounced"
+                  ></v-slider>
+                  <span class="ml-3">≥ {{ costMin }}</span>
+                </div>
+              </v-col>
+
+              <!-- PP滑块 -->
+              <v-col cols="12" sm="4">
+                <div class="d-flex align-center">
+                  <v-slider
+                    v-model="ppMin"
+                    label="PP最小值"
+                    :min="0"
+                    :max="sliderMax.pp"
+                    step="1"
+                    show-ticks
+                    ticks="always"
+                    hide-details="auto"
+                    class="flex-grow-1"
+                    @change="onFilterDebounced"
+                  ></v-slider>
+                  <span class="ml-3">≥ {{ ppMin }}</span>
+                </div>
+              </v-col>
+
+              <!-- DP滑块 -->
+              <v-col cols="12" sm="4">
+                <div class="d-flex align-center">
+                  <v-slider
+                    v-model="dpMin"
+                    label="DP最小值"
+                    :min="0"
+                    :max="sliderMax.dp"
+                    step="1"
+                    show-ticks
+                    ticks="always"
+                    hide-details="auto"
+                    class="flex-grow-1"
+                    @change="onFilterDebounced"
+                  ></v-slider>
+                  <span class="ml-3">≥ {{ dpMin }}</span>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+
+        <!-- 卡牌网格 -->
+        <v-row :cols="12" :sm="2" :md="3" :lg="4" :xl="5" class="g-4">
+          <v-col
+            v-for="card in filteredCards"
+            :key="card.id"
+            class="d-flex"
+          >
+            <v-card
+              class="flex-grow-1"
+              hover
+              @click="openCardDetail(card)"
+            >
+            <v-img :src="imageUrl(card)" aspect-ratio="450/629"  <!-- 精确比例 --> max-width="450"         <!-- 限制最大宽度 -->cover></v-img>
+              <v-card-title class="text-center text-truncate">
+                {{ card.name }}
+              </v-card-title>
+              <v-card-subtitle class="text-center">
+                费用：{{ card.cost }} | PP：{{ card.PP }} | DP：{{ card.DP }}
+              </v-card-subtitle>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <!-- 卡牌详情弹窗 -->
+        <v-dialog
+          v-model="dialog"
+          max-width="500px"
+        >
+          <v-card v-if="selectedCard">
+            <v-card-title class="text-h4">
+              {{ selectedCard.name }}
+            </v-card-title>
             <v-card-text>
-              <v-text-field v-model="q" label="关键词（名称/效果）" dense @input="onFilterDebounced" />
-              <v-select :items="seriesOptions" v-model="filterSeries" label="系列" dense clearable />
-              <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
-              
-              <div class="my-2">类别（多选）</div>
-              <div>
-                <v-chip-group multiple column>
-                  <v-chip
-                    v-for="c in categoryOptions"
-                    :key="c"
-                    :value="c"
-                    @click="toggleChip(c)"
-                    :class="selectedCats.includes(c) ? 'primary white--text' : ''"
-                    outlined
-                    >
-                    {{ c }}
-                  </v-chip>
-                </v-chip-group>
-              </div>
-
-              <v-row class="mt-3" dense>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minCost" label="费用 min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model.number="maxCost" label="费用 max" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-              </v-row>
-
-              <v-row dense>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minPP" label="PP min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model.number="minDP" label="DP min" dense type="number" @input="onFilterDebounced" />
-                </v-col>
-              </v-row>
-
-              <v-row class="mt-4" dense>
-                <v-col cols="6">
-                  <v-btn block @click="resetFilters" color="primary" text>重置</v-btn>
-                </v-col>
-                <v-col cols="6">
-                  <v-btn block @click="exportJson" color="primary">导出JSON</v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-
-        <!-- card grid -->
-        <v-col cols="12" md="9">
-          <v-row align="center" class="mb-2">
-            <v-col>
-              <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
-            </v-col>
-            <v-col class="d-flex" cols="6" md="3">
-              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
-            </v-col>
-          </v-row>
-
-          <v-row>
-            <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
-              <v-card class="hoverable" @click="open(card)" outlined>
-                <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
-                  <template #placeholder>
-                    <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-progress-circular indeterminate color="grey lighten-1" />
-                    </v-row>
-                  </template>
-                </v-img>
-                <v-card-title class="text-no-wrap">{{ card.name }}</v-card-title>
-                <v-card-subtitle class="grey--text text--darken-1">
-                  {{ card.id }} · {{ card.product_series || card.series }} · {{ card.rarity }}
-                </v-card-subtitle>
-                <v-card-text class="py-2">
-                  <div class="caption">{{ card.category }}</div>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- modal -->
-    <v-dialog v-model="dialog" max-width="900px">
-      <v-card>
-        <v-card-title>
-          <span class="text-h6">{{ selectedCard?.name || selectedCard?.id }}</span>
-          <v-spacer />
-          <v-btn icon @click="dialog=false"><v-icon>mdi-close</v-icon></v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col cols="12" md="5">
-              <v-img 
-              :src="imageUrl(card)" 
-              aspect-ratio="450/629"  <!-- 精确比例 -->
-              max-width="450"         <!-- 限制最大宽度 -->
-              cover
+              <v-img
+                :src="imageUrl(selectedCard)"
+                aspect-ratio="450/629"
+                class="mb-4"
+                contain
               ></v-img>
-            </v-col>
-            <v-col cols="12" md="7">
-              <div><strong>ID:</strong> {{ selectedCard?.id }}</div>
-              <div><strong>系列:</strong> {{ selectedCard?.product_series || selectedCard?.series }}</div>
-              <div><strong>颜色:</strong> {{ selectedCard?.color }}</div>
-              <div><strong>稀有度:</strong> {{ selectedCard?.rarity }}</div>
-              <div><strong>类别:</strong> {{ selectedCard?.category }}</div>
-              <div class="mt-2"><strong>效果:</strong>
-                <div style="white-space:pre-wrap">{{ selectedCard?.eff }}</div>
-              </div>
-              <div class="mt-2"><strong>费用 / PP / DP:</strong> {{ selectedCard?.cost }} / {{ selectedCard?.PP }} / {{ selectedCard?.DP }}</div>
+              <v-list>
+                <v-list-item>
+                  <v-list-item-title>系列：{{ selectedCard.series }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>颜色：{{ selectedCard.color }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>费用：{{ selectedCard.cost }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>PP：{{ selectedCard.PP }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>DP：{{ selectedCard.DP }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>效果：{{ selectedCard.eff }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="primary"
+                @click="dialog = false"
+              >
+                关闭
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
+<!-- 在原APP.vue的v-main之后、v-app结束之前，添加以下v-footer部分 -->
+      <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
+        <v-container fluid>
+          <!-- 免责声明 -->
+          <v-row justify="center" class="mb-2">
+            <v-col cols="12" class="text-center">
+              PCG卡查是一个非官方粉丝工具，所有卡牌资料版权归 Bushiroad (武士道) 所有，本网站与 Bushiroad 并无任何官方合作或授权关系。
             </v-col>
           </v-row>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" @click="dialog=false">关闭</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
+          <!-- 版权+问题反馈 -->
+          <v-row justify="center" class="mb-3">
+            <v-col cols="12" class="text-center">
+              © 2025 PCG卡查. All rights reserved. 
+              <span class="mx-2">|</span>
+              <a href="#" class="text-blue-300 hover:underline">问题反馈</a>
+            </v-col>
+          </v-row>
+
+          <!-- 开发者信息 -->
+          <v-row justify="center" align="center">
+            <v-col cols="12" class="text-center">
+              <v-icon size="16" class="mr-1">mdi-code-tags</v-icon>
+              Developed by [你的开发者名称/团队名]
+              <span class="mx-3">|</span>
+              <v-icon size="16" class="mr-1">mdi-palette</v-icon>
+              [设计/协作方名称（可选）]
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-footer>
+    </v-main>
   </v-app>
+  
 </template>
 
-<script>
+<script setup>
 import { computed, onMounted, ref } from 'vue';
 
-/*
-  配置：把 apiBase 和 imagesBase 改成你的地址
-*/
-const apiBase = 'https://pcg-fga3.onrender.com/api' // ← 改成后端地址
-const imagesBase = 'https://pcg-wiki.vercel.app/images' // ← 改成图片目录 URL
+// 响应式变量
+const allCards = ref([]); // 所有卡牌数据
+const searchQuery = ref(''); // 搜索关键词
+const selectedSeries = ref(null); // 选中的系列
+const selectedColors = ref([]); // 选中的颜色
+const costMin = ref(0); // 费用最小值（滑块）
+const ppMin = ref(0); // PP最小值（滑块）
+const dpMin = ref(0); // DP最小值（滑块）
+const selectedCard = ref(null); // 选中的卡牌详情
+const dialog = ref(false); // 弹窗控制
+const imagesBase = 'https://your-image-base-url.com/images'; // 替换为你的图片基础路径（或后端图片接口）
 
-//test
+// 滑块最大值（根据你的卡牌数据调整）
+const sliderMax = ref({
+  cost: 10,
+  pp: 20,
+  dp: 30
+});
 
-export default {
-  setup() {
-    const all = ref([])
-    const q = ref('')
-    const filterSeries = ref('')
-    const filterRarity = ref('')
-    const selectedCats = ref([])
-    const minCost = ref(null)
-    const maxCost = ref(null)
-    const minPP = ref(null)
-    const minDP = ref(null)
-    const sortBy = ref('id_desc')
+// 系列列表（从后端获取或手动定义）
+const seriesList = ref([
+  { text: 'BP01', value: 'BP01' },
+  { text: 'BP02', value: 'BP02' },
+  // 补充你的其他系列
+]);
 
-    const dialog = ref(false)
-    const selectedCard = ref(null)
+// 防抖计时器
+let t = null;
 
-    const sortOptions = [
-      { label: 'ID ↓', value: 'id_desc' },
-      { label: 'ID ↑', value: 'id_asc' },
-      { label: '费用 ↑', value: 'cost_asc' },
-      { label: '费用 ↓', value: 'cost_desc' },
-      { label: '名称 ↑', value: 'name_asc' }
-    ]
+// 防抖过滤触发
+const onFilterDebounced = () => {
+  clearTimeout(t);
+  t = setTimeout(() => {
+    console.log('筛选条件更新');
+  }, 150);
+};
 
-    const seriesOptions = ref([])
-    const rarityOptions = ref([])
-    const categoryOptions = ref([])
+// 生成卡牌图片URL
+const imageUrl = (card) => {
+  return `${imagesBase}/${card.id}.jpg`; // 匹配你的图片命名规则
+};
 
-    const apiFetch = async () => {
-      const candidates = [
-        apiBase ? `${apiBase}/search` : null,
-        apiBase ? `${apiBase}/cards` : null,
-        '/cards.json'
-      ].filter(Boolean)
-      let data = []
-      for (const url of candidates) {
-        try {
-          const r = await fetch(url)
-          if (!r.ok) continue
-          const j = await r.json()
-          data = Array.isArray(j) ? j : (Array.isArray(j.cards) ? j.cards : [])
-          break
-        } catch(e){ /* try next */ }
-      }
-      // normalize
-      all.value = data.map(normalize)
-      // fill filter options
-      seriesOptions.value = [...new Set(all.value.map(c=>c.product_series || c.series).filter(Boolean))].sort()
-      rarityOptions.value = [...new Set(all.value.map(c=>c.rarity).filter(Boolean))].sort()
-      categoryOptions.value = [...new Set(all.value.flatMap(c => (c.category||'').split('/').map(s=>s.trim()).filter(Boolean)))].sort()
+// 打开卡牌详情弹窗
+const openCardDetail = (card) => {
+  selectedCard.value = card;
+  dialog.value = true;
+};
+
+// 筛选后的卡牌列表（核心计算属性）
+const filteredCards = computed(() => {
+  return allCards.value.filter(card => {
+    // 关键词筛选（名称/效果）
+    const keywordMatch = 
+      card.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      (card.eff && card.eff.toLowerCase().includes(searchQuery.value.toLowerCase()));
+
+    // 系列筛选
+    const seriesMatch = selectedSeries.value ? card.series === selectedSeries.value : true;
+
+    // 颜色筛选（多选）
+    const colorMatch = selectedColors.value.length > 0 
+      ? selectedColors.value.includes(card.color) 
+      : true;
+
+    // 滑块筛选（费用/PP/DP）
+    const costMatch = card.cost >= costMin.value;
+    const ppMatch = card.PP >= ppMin.value;
+    const dpMatch = card.DP >= dpMin.value;
+
+    // 所有条件需同时满足
+    return keywordMatch && seriesMatch && colorMatch && costMatch && ppMatch && dpMatch;
+  });
+});
+
+// 初始化获取卡牌数据
+onMounted(async () => {
+  try {
+    // 从后端API获取数据（替换为你的后端接口）
+    const res = await fetch('/api/search');
+    const data = await res.json();
+    allCards.value = data;
+
+    // 自动识别滑块最大值（可选，根据实际数据动态调整）
+    if (data.length > 0) {
+      sliderMax.value = {
+        cost: Math.max(...data.map(c => c.cost)),
+        pp: Math.max(...data.map(c => c.PP)),
+        dp: Math.max(...data.map(c => c.DP))
+      };
     }
 
-    onMounted(apiFetch)
-
-    function normalize(raw){
-      return {
-        id: raw.id || raw.ID || raw.Id || raw.card_id || '',
-        name: raw.name || raw.title || '',
-        product_series: raw.product_series || raw.series || '',
-        category: (raw.category || '').replace(/,/g, '/'),
-        rarity: raw.rarity || raw.rank || '',
-        color: raw.color || raw.colour || '',
-        eff: raw.eff || raw.text || raw.description || '',
-        cost: raw.cost !== undefined ? Number(raw.cost) : null,
-        PP: raw.PP !== undefined ? Number(raw.PP) : null,
-        DP: raw.DP !== undefined ? Number(raw.DP) : null
-      }
-    }
-
-    // computed filtered list
-    const filtered = computed(()=>{
-      let list = all.value.slice()
-      // keyword
-      if (q.value) {
-        const key = q.value.toLowerCase()
-        list = list.filter(c => ((c.name||'') + ' ' + (c.eff||'')).toLowerCase().includes(key))
-      }
-      if (filterSeries.value) list = list.filter(c => (c.product_series||'') === filterSeries.value)
-      if (filterRarity.value) list = list.filter(c => (c.rarity||'') === filterRarity.value)
-      if (selectedCats.value.length) {
-        list = list.filter(c => {
-          const cardCats = (c.category||'').split('/').map(s=>s.trim()).filter(Boolean)
-          return selectedCats.value.every(sel => cardCats.includes(sel))
-        })
-      }
-      if (minCost.value !== null) list = list.filter(c => (c.cost || 0) >= minCost.value)
-      if (maxCost.value !== null) list = list.filter(c => (c.cost || 0) <= maxCost.value)
-      if (minPP.value !== null) list = list.filter(c => (c.PP || 0) >= minPP.value)
-      if (minDP.value !== null) list = list.filter(c => (c.DP || 0) >= minDP.value)
-
-      // sort
-      const mode = sortBy.value
-      list.sort((a,b)=>{
-        if (mode === 'id_desc') return (b.id||'').localeCompare(a.id||'')
-        if (mode === 'id_asc') return (a.id||'').localeCompare(b.id||'')
-        if (mode === 'cost_asc') return (Number(a.cost)||0) - (Number(b.cost)||0)
-        if (mode === 'cost_desc') return (Number(b.cost)||0) - (Number(a.cost)||0)
-        if (mode === 'name_asc') return (a.name||'').localeCompare(b.name||'')
-        return 0
-      })
-      return list
-    })
-
-    function imageUrl(card){
-      const id = encodeURIComponent(card?.id || '')
-      return `${imagesBase}/${id}.jpg`
-    }
-
-    function open(card){
-      selectedCard.value = card
-      dialog.value = true
-    }
-
-    function toggleChip(c){
-      const idx = selectedCats.value.indexOf(c)
-      if (idx >= 0) selectedCats.value.splice(idx,1)
-      else selectedCats.value.push(c)
-    }
-
-    function resetFilters(){
-      q.value = ''
-      filterSeries.value = ''
-      filterRarity.value = ''
-      selectedCats.value = []
-      minCost.value = null; maxCost.value = null; minPP.value = null; minDP.value = null
-    }
-
-    function exportJson(){
-      const data = JSON.stringify(filtered.value, null, 2)
-      const url = URL.createObjectURL(new Blob([data], {type:'application/json'}))
-      const a = document.createElement('a'); a.href = url; a.download = 'cards_export.json'; a.click(); URL.revokeObjectURL(url)
-    }
-
-    // debounce for input
-    let t
-    function onFilterDebounced(){
-      function onFilterDebounced(){
-      clearTimeout(t); 
-      t = setTimeout(()=>{
-    // 触发过滤（计算属性会自动更新，这里可加日志或调试信息）
-      console.log("过滤条件更新");
-      }, 150)
-    }
-    }
-
-    function sortAndRender(){ /* reactive via computed */ }
-
-    return {
-      apiBase, imagesBase,
-      q, filterSeries, filterRarity, minCost, maxCost, minPP, minDP, sortBy,
-      seriesOptions, rarityOptions, categoryOptions, selectedCats,
-      filtered, imageUrl, open, dialog, selectedCard, sortOptions,
-      toggleChip, resetFilters, exportJson, onFilterDebounced
-    }
+    // 提取系列列表（可选，从数据中自动生成）
+    const uniqueSeries = [...new Set(data.map(c => c.series))];
+    seriesList.value = uniqueSeries.map(s => ({ text: s, value: s }));
+  } catch (err) {
+    console.error('获取卡牌数据失败：', err);
   }
-}
+});
 </script>
 
 <style scoped>
-.v-card { cursor: pointer; }
+.v-slider {
+  --v-slider-track-color: #2196f3;
+  --v-slider-thumb-color: #1976d2;
+}
 </style>
