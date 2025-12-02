@@ -3,6 +3,7 @@
     <v-app-bar flat color="white">
       <v-toolbar-title>PCG 卡查 </v-toolbar-title>
       <v-spacer />
+      <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
     </v-app-bar>
 
     <v-container fluid>
@@ -23,8 +24,7 @@
                     :key="c"
                     :value="c"
                     @click="toggleChip(c)"
-                    :color="selectedCats.includes(c) ? 'primary' : ''"
-                    :text-color="selectedCats.includes(c) ? 'white' : ''"
+                    :class="selectedCats.includes(c) ? 'primary white--text' : ''"
                     outlined
                     >
                     {{ c }}
@@ -69,20 +69,14 @@
               <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
             </v-col>
             <v-col class="d-flex" cols="6" md="3">
-              <v-select dense hide-details :items="sortOptions" item-text="label" item-value="value"  v-model="sortBy" label="排序" @change="sortAndRender" />            
+              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
             </v-col>
           </v-row>
 
           <v-row>
             <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
               <v-card class="hoverable" @click="open(card)" outlined>
-            <!-- 修正后 -->
-            <v-img 
-              :src="imageUrl(card)" 
-              aspect-ratio="450/629"  <!-- 精确比例 -->
-              max-width="450"         <!-- 限制最大宽度 -->
-              cover
-            >
+                <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
                   <template #placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-1" />
@@ -115,9 +109,9 @@
           <v-row>
             <v-col cols="12" md="5">
               <v-img 
-              :src="imageUrl(selectedCard)" 
-              aspect-ratio="450/629"  <!-- 精确比例 -->
-              max-width="450"         <!-- 限制最大宽度 -->
+              :src="imageUrl(card)" 
+              aspect-ratio="450/629" 
+              max-width="450"       
               cover
               ></v-img>
             </v-col>
@@ -289,13 +283,16 @@ export default {
     }
 
     // debounce for input
-let t
-function onFilterDebounced(){
-  clearTimeout(t); 
-  t = setTimeout(()=>{
-    console.log("过滤条件更新");
-  }, 150)
-}
+    let t
+    function onFilterDebounced(){
+      function onFilterDebounced(){
+      clearTimeout(t); 
+      t = setTimeout(()=>{
+    // 触发过滤（计算属性会自动更新，这里可加日志或调试信息）
+      console.log("过滤条件更新");
+      }, 150)
+    }
+    }
 
     function sortAndRender(){ /* reactive via computed */ }
 
