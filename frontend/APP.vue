@@ -3,8 +3,7 @@
     <v-app-bar flat color="white">
       <v-toolbar-title>PCG 卡查 </v-toolbar-title>
       <v-spacer />
-      <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
-    </v-app-bar>1
+    </v-app-bar>
 
     <v-container fluid>
       <v-row>
@@ -24,7 +23,8 @@
                     :key="c"
                     :value="c"
                     @click="toggleChip(c)"
-                    :class="selectedCats.includes(c) ? 'primary white--text' : ''"
+                    :color="selectedCats.includes(c) ? 'primary' : ''"
+                    :text-color="selectedCats.includes(c) ? 'white' : ''"
                     outlined
                     >
                     {{ c }}
@@ -69,22 +69,20 @@
               <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
             </v-col>
             <v-col class="d-flex" cols="6" md="3">
-              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />            
-              item-text="label"  <!-- 新增 -->
-              item-value="value" <!-- 新增 -->
+              <v-select dense hide-details :items="sortOptions" item-text="label" item-value="value"  v-model="sortBy" label="排序" @change="sortAndRender" />            
             </v-col>
           </v-row>
 
           <v-row>
             <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
               <v-card class="hoverable" @click="open(card)" outlined>
-<!-- 修正后 -->
-<v-img 
-  :src="imageUrl(card)" 
-  aspect-ratio="450/629"  <!-- 精确比例 -->
-  max-width="450"         <!-- 限制最大宽度 -->
-  cover
->
+            <!-- 修正后 -->
+            <v-img 
+              :src="imageUrl(card)" 
+              aspect-ratio="450/629"  <!-- 精确比例 -->
+              max-width="450"         <!-- 限制最大宽度 -->
+              cover
+            >
                   <template #placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-1" />
