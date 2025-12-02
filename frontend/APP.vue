@@ -200,13 +200,13 @@ export default {
     const dialog = ref(false)
     const selectedCard = ref(null)
 
-    const sortOptions = [
-      { label: 'ID ↓', value: 'id_desc' },
-      { label: 'ID ↑', value: 'id_asc' },
-      { label: '费用 ↑', value: 'cost_asc' },
-      { label: '费用 ↓', value: 'cost_desc' },
-      { label: '名称 ↑', value: 'name_asc' }
-    ]
+  const sortOptions = [
+    { label: 'ID ↑', value: 'id_asc' },
+    { label: 'ID ↓', value: 'id_desc' },
+    { label: '费用 ↑', value: 'cost_asc' },
+    { label: '费用 ↓', value: 'cost_desc' },
+    { label: '名称 ↑', value: 'name_asc' }
+  ]
 
     const seriesOptions = ref([])
     const rarityOptions = ref([])
