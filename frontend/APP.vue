@@ -1,7 +1,9 @@
 <template>
   <v-app>
+    <!-- 主体内容 -->
     <v-main>
       <v-container fluid class="py-4">
+        <!-- 搜索栏、筛选面板、卡牌网格、弹窗 这些内容保持不变 -->
         <!-- 搜索栏 -->
         <v-card class="mb-4">
           <v-card-text>
@@ -103,10 +105,17 @@
               <v-img 
                 :src="imageUrl(card)" 
                 aspect-ratio="450/629"  
+<<<<<<< HEAD
                 class="pa-2"
                 contain
               ></v-img>
               <v-card-title class="text-center text-truncate py-2">
+=======
+                max-width="450"         
+                cover
+              ></v-img>
+              <v-card-title class="text-center text-truncate">
+>>>>>>> 10ebfc94c5615f10c99f434c071d7ffdf9cbd14c
                 {{ card.name }}
               </v-card-title>
               <v-card-subtitle class="text-center pb-2">
@@ -166,14 +175,26 @@
       </v-container>
     </v-main>
 
+<<<<<<< HEAD
     <!-- 底部免责声明 -->
     <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
       <v-container fluid>
+=======
+    <!-- 免责声明 Footer：放在 v-main 外面，作为 v-app 的直接子元素 -->
+    <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
+      <v-container fluid>
+        <!-- 免责声明 -->
+>>>>>>> 10ebfc94c5615f10c99f434c071d7ffdf9cbd14c
         <v-row justify="center" class="mb-2">
           <v-col cols="12" class="text-center">
             PCG卡查是一个非官方粉丝工具，所有卡牌资料版权归 Bushiroad (武士道) 所有，本网站与 Bushiroad 并无任何官方合作或授权关系。
           </v-col>
         </v-row>
+<<<<<<< HEAD
+=======
+
+        <!-- 版权+问题反馈 -->
+>>>>>>> 10ebfc94c5615f10c99f434c071d7ffdf9cbd14c
         <v-row justify="center" class="mb-3">
           <v-col cols="12" class="text-center">
             © 2025 PCG卡查. All rights reserved. 
@@ -181,6 +202,11 @@
             <a href="#" class="text-blue-300 hover:underline">问题反馈</a>
           </v-col>
         </v-row>
+<<<<<<< HEAD
+=======
+
+        <!-- 开发者信息 -->
+>>>>>>> 10ebfc94c5615f10c99f434c071d7ffdf9cbd14c
         <v-row justify="center" align="center">
           <v-col cols="12" class="text-center">
             <v-icon size="16" class="mr-1">mdi-code-tags</v-icon>
@@ -199,6 +225,7 @@
 import { computed, onMounted, ref } from 'vue';
 
 // 响应式变量
+<<<<<<< HEAD
 const allCards = ref([]); 
 const searchQuery = ref(''); 
 const selectedSeries = ref(null); 
@@ -210,6 +237,18 @@ const dpMin = ref(0);
 const selectedCard = ref(null); 
 const dialog = ref(false); 
 const imagesBase = 'https://your-image-base-url.com/images'; // 替换为实际图片路径
+=======
+const allCards = ref([]); // 所有卡牌数据
+const searchQuery = ref(''); // 搜索关键词
+const selectedSeries = ref(null); // 选中的系列
+const selectedColors = ref([]); // 选中的颜色
+const costMin = ref(0); // 费用最小值（滑块）
+const ppMin = ref(0); // PP最小值（滑块）
+const dpMin = ref(0); // DP最小值（滑块）
+const selectedCard = ref(null); // 选中的卡牌详情
+const dialog = ref(false); // 弹窗控制
+const imagesBase = 'https://your-image-base-url.com/images'; // 替换为你的图片基础路径
+>>>>>>> 10ebfc94c5615f10c99f434c071d7ffdf9cbd14c
 
 // 系列列表
 const seriesList = ref([
@@ -297,5 +336,11 @@ onMounted(async () => {
 /* 链接样式 */
 a {
   text-decoration: none;
+}
+
+/* 可选：给 footer 链接加 hover 效果 */
+a {
+  text-decoration: none;
+  transition: color 0.2s;
 }
 </style>
