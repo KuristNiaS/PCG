@@ -19,8 +19,8 @@
                 <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
                 
                 <div class="my-2">类别（多选）</div>
-                <div>
-                  <v-chip-group multiple column>
+                <div class="chip-container">
+                  <v-chip-group multiple >
                     <v-chip
                       v-for="c in categoryOptions"
                       :key="c"
@@ -29,6 +29,7 @@
                       :color="selectedCats.includes(c) ? 'primary' : ''"
                       :text-color="selectedCats.includes(c) ? 'white' : ''"
                       outlined
+                      class="chip-item"
                       >
                       {{ c }}
                     </v-chip>
@@ -46,10 +47,12 @@
 
                 <v-row dense>
                   <v-col cols="6">
-                    <v-text-field v-model.number="minPP" label="PP min" dense type="number" @input="onFilterDebounced" />
+                    <!-- 标签改为“PP”，绑定变量改为ppValue -->
+                    <v-text-field v-model.number="ppValue" label="PP" dense type="number" @input="onFilterDebounced" />
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field v-model.number="minDP" label="DP min" dense type="number" @input="onFilterDebounced" />
+                    <!-- 标签改为“DP”，绑定变量改为dpValue -->
+                    <v-text-field v-model.number="dpValue" label="DP" dense type="number" @input="onFilterDebounced" />
                   </v-col>
                 </v-row>
 
@@ -72,7 +75,16 @@
                 <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
               </v-col>
               <v-col class="d-flex" cols="6" md="3">
-                <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
+                <v-select 
+                  dense 
+                  hide-details 
+                  :items="sortOptions" 
+                  v-model="sortBy" 
+                  label="排序" 
+                  @change="sortAndRender" 
+                  item-text="label"
+                  item-value="value" 
+                ></v-select>
               </v-col>
             </v-row>
 
@@ -161,8 +173,8 @@ export default {
     const selectedCats = ref([])
     const minCost = ref(null)
     const maxCost = ref(null)
-    const minPP = ref(null)
-    const minDP = ref(null)
+    const ppValue = ref(null) // 精确匹配的PP值
+    const dpValue = ref(null) // 精确匹配的DP值
     const sortBy = ref('id_desc')
 
     const dialog = ref(false)
@@ -239,8 +251,14 @@ export default {
       }
       if (minCost.value !== null) list = list.filter(c => (c.cost || 0) >= minCost.value)
       if (maxCost.value !== null) list = list.filter(c => (c.cost || 0) <= maxCost.value)
-      if (minPP.value !== null) list = list.filter(c => (c.PP || 0) >= minPP.value)
-      if (minDP.value !== null) list = list.filter(c => (c.DP || 0) >= minDP.value)
+      if (ppValue.value !== null) {
+        // 仅保留PP值与输入完全相等的卡牌（处理null/undefined的情况）
+        list = list.filter(c => (c.PP || null) === ppValue.value)
+      }
+      if (dpValue.value !== null) {
+        // 仅保留DP值与输入完全相等的卡牌
+        list = list.filter(c => (c.DP || null) === dpValue.value)
+      }
 
       // sort
       const mode = sortBy.value
@@ -276,7 +294,7 @@ export default {
       filterSeries.value = ''
       filterRarity.value = ''
       selectedCats.value = []
-      minCost.value = null; maxCost.value = null; minPP.value = null; minDP.value = null
+      minCost.value = null; maxCost.value = null; ppValue.value = null; dpValue.value = null
     }
 
     function exportJson(){
@@ -299,7 +317,7 @@ export default {
 
     return {
       apiBase, imagesBase,
-      q, filterSeries, filterRarity, minCost, maxCost, minPP, minDP, sortBy,
+      q, filterSeries, filterRarity, minCost, maxCost, ppValue, dpValue, sortBy,
       seriesOptions, rarityOptions, categoryOptions, selectedCats,
       filtered, imageUrl, open, dialog, selectedCard, sortOptions,
       toggleChip, resetFilters, exportJson, onFilterDebounced
@@ -310,4 +328,24 @@ export default {
 
 <style scoped>
 .v-card { cursor: pointer; }
+
+/* 控制芯片容器布局 */
+.chip-container {
+  display: flex;
+  flex-wrap: wrap; /* 超出换行 */
+  gap: 8px; /* 芯片之间的间距 */
+}
+
+/* 控制每个芯片的宽度（一行4个） */
+.chip-item {
+  flex: 0 0 calc(25% - 8px); /* 25%宽度减去间距，实现一行4个 */
+  box-sizing: border-box;
+}
+
+/* 响应式调整：小屏幕每行显示2个 */
+@media (max-width: 600px) {
+  .chip-item {
+    flex: 0 0 calc(50% - 8px);
+  }
+}
 </style>
