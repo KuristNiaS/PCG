@@ -408,7 +408,7 @@ export default {
 }
 
 .v-application {
-  background-color: #616161 !important;
+  background-color: #FAFAFA !important;
 }
 
 .filters-col {
