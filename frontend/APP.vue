@@ -19,24 +19,20 @@
                 <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
                 
               <div class="my-2">类别（多选）</div>
-              <!-- 外层网格容器 -->
-              <div class="category-container">
-                <!-- 禁用v-chip-group的默认滚动 -->
-                <v-chip-group multiple class="chip-group-custom">
+                <!-- 一行 4 个的 Chip 容器 -->
+                <div class="chip-container">
                   <v-chip
                     v-for="c in categoryOptions"
                     :key="c"
-                    :value="c"
-                    @click="toggleChip(c)"
+                    class="chip-item"
                     :color="selectedCats.includes(c) ? 'primary' : ''"
                     :text-color="selectedCats.includes(c) ? 'white' : ''"
                     outlined
-                    class="category-chip"
+                    @click="toggleChip(c)"
                   >
                     {{ c }}
                   </v-chip>
-                </v-chip-group>
-              </div>
+                </div>
                 <v-row class="mt-3" dense>
                   <v-col cols="6">
                     <v-text-field v-model.number="minCost" label="费用 min" dense type="number" @input="onFilterDebounced" />
@@ -76,16 +72,16 @@
                 <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
               </v-col>
               <v-col class="d-flex" cols="6" md="3">
-                <v-select
-                  dense 
-                  hide-details 
-                  :items="sortOptions" 
-                  v-model="sortBy" 
-                  label="排序" 
-                  @change="sortAndRender" 
-                  item-text="label"
-                  item-value="value" 
-                ></v-select>
+              <v-select
+                dense
+                hide-details
+                :items="sortOptions"
+                v-model="sortBy"
+                label="排序"
+                item-title="label"
+                item-value="value"
+                @change="sortAndRender"
+              />
               </v-col>
             </v-row>
 
@@ -335,55 +331,26 @@ export default {
 <style scoped>
 .v-card { cursor: pointer; }
 
-/* 外层容器：强制两栏网格 */
-.category-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 固定2列 */
-  gap: 8px; /* 间距 */
-}
-
-/* 禁用v-chip-group的默认滚动 */
-::v-deep .chip-group-custom {
-  display: contents; /* 让内部芯片直接参与网格布局 */
-  overflow-x: visible !important; /* 强制禁用横向滚动 */
-  flex-wrap: nowrap !important; /* 取消默认换行限制 */
-}
-
-/* 单个类别芯片样式 */
-.category-chip {
-  width: 100%; /* 占满列宽 */
-  justify-content: center; /* 文字居中 */
-}
-
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 固定分为2列 */
-  gap: 8px; /* 列和行之间的间距 */
-}
-
-/* 每个类别项的样式 */
-.category-item {
-  width: 100%; /* 占满列宽 */
-  justify-content: center; /* 文字居中 */
-}
-
-/* 控制芯片容器布局 */
+/* 芯片容器：flex + wrap */
 .chip-container {
   display: flex;
-  flex-wrap: wrap; /* 超出换行 */
-  gap: 8px; /* 芯片之间的间距 */
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-/* 控制每个芯片的宽度（一行4个） */
+/* 每行 4 个 */
 .chip-item {
-  flex: 0 0 calc(25% - 8px); /* 25%宽度减去间距，实现一行4个 */
-  box-sizing: border-box;
+  flex: 0 0 calc(25% - 8px);
+  justify-content: center;
+  width: calc(25% - 8px);
 }
 
-/* 响应式调整：小屏幕每行显示2个 */
+/* 小屏幕：每行 2 个 */
 @media (max-width: 600px) {
   .chip-item {
     flex: 0 0 calc(50% - 8px);
+    width: calc(50% - 8px);
   }
 }
+
 </style>
