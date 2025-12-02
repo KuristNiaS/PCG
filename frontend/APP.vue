@@ -142,6 +142,8 @@ import { computed, onMounted, ref } from 'vue';
 const apiBase = 'https://pcg-fga3.onrender.com/api' // ← 改成后端地址
 const imagesBase = 'https://pcg-wiki.vercel.app/images' // ← 改成图片目录 URL
 
+//test
+
 export default {
   setup() {
     const all = ref([])
