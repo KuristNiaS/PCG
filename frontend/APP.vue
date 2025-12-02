@@ -69,14 +69,22 @@
               <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
             </v-col>
             <v-col class="d-flex" cols="6" md="3">
-              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />
+              <v-select dense hide-details :items="sortOptions" v-model="sortBy" label="排序" @change="sortAndRender" />            
+              item-text="label"  <!-- 新增 -->
+              item-value="value" <!-- 新增 -->
             </v-col>
           </v-row>
 
           <v-row>
             <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
               <v-card class="hoverable" @click="open(card)" outlined>
-                <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
+<!-- 修正后 -->
+<v-img 
+  :src="imageUrl(card)" 
+  aspect-ratio="450/629"  <!-- 精确比例 -->
+  max-width="450"         <!-- 限制最大宽度 -->
+  cover
+>
                   <template #placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-1" />
@@ -109,7 +117,7 @@
           <v-row>
             <v-col cols="12" md="5">
               <v-img 
-              :src="imageUrl(card)" 
+              :src="imageUrl(selectedCard)" 
               aspect-ratio="450/629"  <!-- 精确比例 -->
               max-width="450"         <!-- 限制最大宽度 -->
               cover
@@ -283,16 +291,25 @@ export default {
     }
 
     // debounce for input
-    let t
-    function onFilterDebounced(){
-      function onFilterDebounced(){
-      clearTimeout(t); 
-      t = setTimeout(()=>{
-    // 触发过滤（计算属性会自动更新，这里可加日志或调试信息）
-      console.log("过滤条件更新");
-      }, 150)
-    }
-    }
+// 修正前（错误，嵌套函数）
+let t
+function onFilterDebounced(){
+  function onFilterDebounced(){
+  clearTimeout(t); 
+  t = setTimeout(()=>{
+    console.log("过滤条件更新");
+  }, 150)
+  }
+}
+
+// 修正后（正确）
+let t
+function onFilterDebounced(){
+  clearTimeout(t); 
+  t = setTimeout(()=>{
+    console.log("过滤条件更新");
+  }, 150)
+}
 
     function sortAndRender(){ /* reactive via computed */ }
 
