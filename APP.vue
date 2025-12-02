@@ -140,7 +140,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
   配置：把 apiBase 和 imagesBase 改成你的地址
 */
 const apiBase = 'https://pcg-fga3.onrender.com' // ← 改成后端地址
-const imagesBase = 'https://pcg-green.vercel.app/images' // ← 改成图片目录 URL
+const imagesBase = 'https://pcg-dic.vercel.app/images' // ← 改成图片目录 URL
 
 export default {
   setup() {
