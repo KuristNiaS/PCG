@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <v-app-bar flat color="white" app> <!-- 添加app属性解决遮挡问题 -->
-      <v-toolbar-title>PCG 卡查 </v-toolbar-title>
+    <v-app-bar flat color="grey-lighten-2" app class="appbar-custom"> <!-- 添加app属性解决遮挡问题 -->
+      <v-toolbar-title>PCG wiki </v-toolbar-title>
       <v-spacer />
       <!-- 已移除API文本显示 -->
     </v-app-bar>
@@ -11,8 +11,8 @@
       <v-container fluid>
         <v-row>
           <!-- filters -->
-          <v-col cols="12" md="3">
-            <v-card outlined>
+          <v-col cols="12" md="3" class="filters-col">
+            <v-card outlined class="filters-card" elevation="2">
               <v-card-text>
                 <v-text-field v-model="q" label="关键词（名称/效果）" dense @input="onFilterDebounced" />
                 <v-select :items="seriesOptions" v-model="filterSeries" label="系列" dense clearable />
@@ -408,7 +408,24 @@ export default {
 }
 
 .v-application {
-  background-color: #1e242a !important;
+  background-color: #616161 !important;
 }
 
+.filters-col {
+  /* sticky 生效时要同时设置 align-self:start，确保列不会拉伸 */
+  align-self: start;
+  position: sticky;
+  top: 64px;            /* 距离视口顶部 64px（通常 v-app-bar 高度）。根据实际 app-bar 高度调整 */
+  z-index: 5;           /* 保证浮在内容之上但低于 dialog 等 */
+  padding-top: 8px;     /* 视觉微调 */
+}
+
+/* 在小屏幕禁用 sticky（避免遮挡并更适配移动端） */
+@media (max-width: 960px) {
+  .filters-col {
+    position: static;
+    top: auto;
+    z-index: auto;
+  }
+}
 </style>
