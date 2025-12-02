@@ -19,8 +19,9 @@
                 <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
                 
                 <div class="my-2">类别（多选）</div>
-                <div class="chip-container">
-                  <v-chip-group multiple >
+                <!-- 用grid容器强制两栏布局 -->
+                <div class="category-grid">
+                  <v-chip-group multiple>
                     <v-chip
                       v-for="c in categoryOptions"
                       :key="c"
@@ -29,8 +30,8 @@
                       :color="selectedCats.includes(c) ? 'primary' : ''"
                       :text-color="selectedCats.includes(c) ? 'white' : ''"
                       outlined
-                      class="chip-item"
-                      >
+                      class="category-item"
+                    >
                       {{ c }}
                     </v-chip>
                   </v-chip-group>
@@ -141,7 +142,12 @@
               <div class="mt-2"><strong>效果:</strong>
                 <div style="white-space:pre-wrap">{{ selectedCard?.eff }}</div>
               </div>
-              <div class="mt-2"><strong>费用 / PP / DP:</strong> {{ selectedCard?.cost }} / {{ selectedCard?.PP }} / {{ selectedCard?.DP }}</div>
+              <div 
+                class="mt-2" 
+                v-if="selectedCard?.category?.includes('角色')"  
+              >
+                <strong>费用 / PP / DP:</strong> {{ selectedCard?.cost }} / {{ selectedCard?.PP }} / {{ selectedCard?.DP }}
+              </div>            
             </v-col>
           </v-row>
         </v-card-text>
@@ -328,6 +334,17 @@ export default {
 
 <style scoped>
 .v-card { cursor: pointer; }
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 固定分为2列 */
+  gap: 8px; /* 列和行之间的间距 */
+}
+
+/* 每个类别项的样式 */
+.category-item {
+  width: 100%; /* 占满列宽 */
+  justify-content: center; /* 文字居中 */
+}
 
 /* 控制芯片容器布局 */
 .chip-container {
