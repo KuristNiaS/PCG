@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar flat color="grey-lighten-2" app class="appbar-custom"> <!-- 添加app属性解决遮挡问题 -->
-      <v-toolbar-title>PCG wiki </v-toolbar-title>
+      <v-toolbar-title>Kurocards wiki </v-toolbar-title>
       <v-spacer />
       <!-- 已移除API文本显示 -->
     </v-app-bar>
@@ -110,12 +110,12 @@
         <!-- Footer 声明区域 -->
         <div class="footer">
           <p class="footer-text">
-            PCG-wiki 是一个非官方粉丝工具，所有卡牌资料版权归集卡社所有，
+            Kurocards 是一个非官方粉丝工具，所有卡牌资料版权归集卡社所有，
             本网站与集卡社并无任何官方合作或授权关系。
           </p>
 
           <p class="footer-text">
-            © 2025 PCG-wiki. All rights reserved.
+            © 2025 Kurocards. All rights reserved.
             <a href="mailto: sj-nick@foxmail.com" target="_blank" class="footer-link">｜问题反馈</a>
           </p>
 
