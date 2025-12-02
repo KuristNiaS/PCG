@@ -18,25 +18,25 @@
                 <v-select :items="seriesOptions" v-model="filterSeries" label="系列" dense clearable />
                 <v-select :items="rarityOptions" v-model="filterRarity" label="稀有度" dense clearable />
                 
-                <div class="my-2">类别（多选）</div>
-                <!-- 用grid容器强制两栏布局 -->
-                <div class="category-grid">
-                  <v-chip-group multiple>
-                    <v-chip
-                      v-for="c in categoryOptions"
-                      :key="c"
-                      :value="c"
-                      @click="toggleChip(c)"
-                      :color="selectedCats.includes(c) ? 'primary' : ''"
-                      :text-color="selectedCats.includes(c) ? 'white' : ''"
-                      outlined
-                      class="category-item"
-                    >
-                      {{ c }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
-
+              <div class="my-2">类别（多选）</div>
+              <!-- 外层网格容器 -->
+              <div class="category-container">
+                <!-- 禁用v-chip-group的默认滚动 -->
+                <v-chip-group multiple class="chip-group-custom">
+                  <v-chip
+                    v-for="c in categoryOptions"
+                    :key="c"
+                    :value="c"
+                    @click="toggleChip(c)"
+                    :color="selectedCats.includes(c) ? 'primary' : ''"
+                    :text-color="selectedCats.includes(c) ? 'white' : ''"
+                    outlined
+                    class="category-chip"
+                  >
+                    {{ c }}
+                  </v-chip>
+                </v-chip-group>
+              </div>
                 <v-row class="mt-3" dense>
                   <v-col cols="6">
                     <v-text-field v-model.number="minCost" label="费用 min" dense type="number" @input="onFilterDebounced" />
@@ -76,7 +76,7 @@
                 <div class="subtitle-1 grey--text">{{ filtered.length }} 张卡</div>
               </v-col>
               <v-col class="d-flex" cols="6" md="3">
-                <v-select 
+                <v-select
                   dense 
                   hide-details 
                   :items="sortOptions" 
@@ -334,6 +334,27 @@ export default {
 
 <style scoped>
 .v-card { cursor: pointer; }
+
+/* 外层容器：强制两栏网格 */
+.category-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 固定2列 */
+  gap: 8px; /* 间距 */
+}
+
+/* 禁用v-chip-group的默认滚动 */
+::v-deep .chip-group-custom {
+  display: contents; /* 让内部芯片直接参与网格布局 */
+  overflow-x: visible !important; /* 强制禁用横向滚动 */
+  flex-wrap: nowrap !important; /* 取消默认换行限制 */
+}
+
+/* 单个类别芯片样式 */
+.category-chip {
+  width: 100%; /* 占满列宽 */
+  justify-content: center; /* 文字居中 */
+}
+
 .category-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 固定分为2列 */
