@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <v-app-bar flat color="white">
-      <v-toolbar-title>PCG 卡片库 (Vuetify)</v-toolbar-title>
+      <v-toolbar-title>PCG 卡查 </v-toolbar-title>
       <v-spacer />
       <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
-    </v-app-bar>
+    </v-app-bar>1
 
     <v-container fluid>
       <v-row>
