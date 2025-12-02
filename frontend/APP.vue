@@ -5,7 +5,7 @@
       <v-spacer />
       <!-- 已移除API文本显示 -->
     </v-app-bar>
-
+    
     <!-- 添加v-main包裹内容，解决导航栏遮挡问题 -->
     <v-main>
       <v-container fluid>
@@ -429,3 +429,5 @@ export default {
   }
 }
 </style>
+
+<!update>
