@@ -45,7 +45,7 @@ def search(
     offset: int = 0,
     db=Depends(get_db)
 ):
-    sql = "SELECT id, name, color, eff, cost, PP, DP, image_url FROM card"
+    sql = "SELECT id, name, series, color, category, rarity, eff, cost, PP, DP FROM card"
     where = []
     params = []
     if q:
@@ -82,7 +82,7 @@ def search(
 def get_card(card_id: str, db=Depends(get_db)):
     c = db.cursor()
     c.execute("""
-        SELECT id, name, color, eff, cost, PP, DP
+        SELECT iid, name, series, color, category, rarity, eff, cost, PP, DP
         FROM card
         WHERE id = ?
     """, (card_id,))
