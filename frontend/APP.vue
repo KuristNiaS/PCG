@@ -24,7 +24,8 @@
                     :key="c"
                     :value="c"
                     @click="toggleChip(c)"
-                    :class="selectedCats.includes(c) ? 'primary white--text' : ''"
+                    :color="selectedCats.includes(c) ? 'primary' : ''"
+                    :text-color="selectedCats.includes(c) ? 'white' : ''"
                     outlined
                     >
                     {{ c }}
