@@ -1,9 +1,7 @@
 <template>
   <v-app>
-    <!-- 主体内容 -->
     <v-main>
       <v-container fluid class="py-4">
-        <!-- 搜索栏、筛选面板、卡牌网格、弹窗 这些内容保持不变 -->
         <!-- 搜索栏 -->
         <v-card class="mb-4">
           <v-card-text>
@@ -23,7 +21,7 @@
           <v-card-text>
             <v-row>
               <!-- 系列筛选 -->
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-select
                   v-model="selectedSeries"
                   label="选择系列"
@@ -37,7 +35,7 @@
               </v-col>
 
               <!-- 颜色筛选 -->
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-checkbox-group
                   v-model="selectedColors"
                   label="选择颜色"
@@ -50,72 +48,48 @@
                   <v-checkbox label="白" value="白"></v-checkbox>
                 </v-checkbox-group>
               </v-col>
-            </v-row>
 
-            <!-- 滑块筛选：费用/PP/DP -->
-            <v-row class="mt-4">
-              <!-- 费用滑块 -->
-              <v-col cols="12" sm="4">
-                <div class="d-flex align-center">
-                  <v-slider
-                    v-model="costMin"
-                    label="费用最小值"
-                    :min="0"
-                    :max="sliderMax.cost"
-                    step="1"
-                    show-ticks
-                    ticks="always"
-                    hide-details="auto"
-                    class="flex-grow-1"
-                    @change="onFilterDebounced"
-                  ></v-slider>
-                  <span class="ml-3">≥ {{ costMin }}</span>
-                </div>
+              <!-- 费用/PP/DP 输入框筛选（恢复原样式） -->
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model.number="costMin"
+                  label="费用≥"
+                  type="number"
+                  min="0"
+                  @input="onFilterDebounced"
+                ></v-text-field>
               </v-col>
-
-              <!-- PP滑块 -->
-              <v-col cols="12" sm="4">
-                <div class="d-flex align-center">
-                  <v-slider
-                    v-model="ppMin"
-                    label="PP最小值"
-                    :min="0"
-                    :max="sliderMax.pp"
-                    step="1"
-                    show-ticks
-                    ticks="always"
-                    hide-details="auto"
-                    class="flex-grow-1"
-                    @change="onFilterDebounced"
-                  ></v-slider>
-                  <span class="ml-3">≥ {{ ppMin }}</span>
-                </div>
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model.number="ppMin"
+                  label="PP≥"
+                  type="number"
+                  min="0"
+                  @input="onFilterDebounced"
+                ></v-text-field>
               </v-col>
-
-              <!-- DP滑块 -->
-              <v-col cols="12" sm="4">
-                <div class="d-flex align-center">
-                  <v-slider
-                    v-model="dpMin"
-                    label="DP最小值"
-                    :min="0"
-                    :max="sliderMax.dp"
-                    step="1"
-                    show-ticks
-                    ticks="always"
-                    hide-details="auto"
-                    class="flex-grow-1"
-                    @change="onFilterDebounced"
-                  ></v-slider>
-                  <span class="ml-3">≥ {{ dpMin }}</span>
-                </div>
+              <v-col cols="12" md="2">
+                <v-text-field
+                  v-model.number="dpMin"
+                  label="DP≥"
+                  type="number"
+                  min="0"
+                  @input="onFilterDebounced"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
 
-        <!-- 卡牌网格 -->
-        <v-row :cols="12" :sm="2" :md="3" :lg="4" :xl="5" class="g-4">
+        <!-- 卡牌网格（优化布局，确保显示） -->
+        <v-row :cols="1" :sm="2" :md="3" :lg="4" :xl="5" class="g-4">
+          <!-- 无数据提示 -->
+          <v-col v-if="filteredCards.length === 0" class="text-center py-8">
+            <v-icon size="64" class="text-gray-400 mb-2">mdi-card-text</v-icon>
+            <p class="text-gray-500">暂无匹配的卡牌数据</p>
+          </v-col>
+
+          <!-- 卡牌列表 -->
           <v-col
             v-for="card in filteredCards"
             :key="card.id"
@@ -129,13 +103,13 @@
               <v-img 
                 :src="imageUrl(card)" 
                 aspect-ratio="450/629"  
-                max-width="450"         
-                cover
+                class="pa-2"
+                contain
               ></v-img>
-              <v-card-title class="text-center text-truncate">
+              <v-card-title class="text-center text-truncate py-2">
                 {{ card.name }}
               </v-card-title>
-              <v-card-subtitle class="text-center">
+              <v-card-subtitle class="text-center pb-2">
                 费用：{{ card.cost }} | PP：{{ card.PP }} | DP：{{ card.DP }}
               </v-card-subtitle>
             </v-card>
@@ -192,17 +166,14 @@
       </v-container>
     </v-main>
 
-    <!-- 免责声明 Footer：放在 v-main 外面，作为 v-app 的直接子元素 -->
+    <!-- 底部免责声明 -->
     <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
       <v-container fluid>
-        <!-- 免责声明 -->
         <v-row justify="center" class="mb-2">
           <v-col cols="12" class="text-center">
             PCG卡查是一个非官方粉丝工具，所有卡牌资料版权归 Bushiroad (武士道) 所有，本网站与 Bushiroad 并无任何官方合作或授权关系。
           </v-col>
         </v-row>
-
-        <!-- 版权+问题反馈 -->
         <v-row justify="center" class="mb-3">
           <v-col cols="12" class="text-center">
             © 2025 PCG卡查. All rights reserved. 
@@ -210,8 +181,6 @@
             <a href="#" class="text-blue-300 hover:underline">问题反馈</a>
           </v-col>
         </v-row>
-
-        <!-- 开发者信息 -->
         <v-row justify="center" align="center">
           <v-col cols="12" class="text-center">
             <v-icon size="16" class="mr-1">mdi-code-tags</v-icon>
@@ -230,35 +199,26 @@
 import { computed, onMounted, ref } from 'vue';
 
 // 响应式变量
-const allCards = ref([]); // 所有卡牌数据
-const searchQuery = ref(''); // 搜索关键词
-const selectedSeries = ref(null); // 选中的系列
-const selectedColors = ref([]); // 选中的颜色
-const costMin = ref(0); // 费用最小值（滑块）
-const ppMin = ref(0); // PP最小值（滑块）
-const dpMin = ref(0); // DP最小值（滑块）
-const selectedCard = ref(null); // 选中的卡牌详情
-const dialog = ref(false); // 弹窗控制
-const imagesBase = 'https://your-image-base-url.com/images'; // 替换为你的图片基础路径
+const allCards = ref([]); 
+const searchQuery = ref(''); 
+const selectedSeries = ref(null); 
+const selectedColors = ref([]); 
+// 恢复为输入框绑定的数值（默认0）
+const costMin = ref(0); 
+const ppMin = ref(0); 
+const dpMin = ref(0); 
+const selectedCard = ref(null); 
+const dialog = ref(false); 
+const imagesBase = 'https://your-image-base-url.com/images'; // 替换为实际图片路径
 
-// 滑块最大值（根据你的卡牌数据调整）
-const sliderMax = ref({
-  cost: 10,
-  pp: 20,
-  dp: 30
-});
-
-// 系列列表（从后端获取或手动定义）
+// 系列列表
 const seriesList = ref([
   { text: 'BP01', value: 'BP01' },
   { text: 'BP02', value: 'BP02' },
-  // 补充你的其他系列
 ]);
 
 // 防抖计时器
 let t = null;
-
-// 防抖过滤触发
 const onFilterDebounced = () => {
   clearTimeout(t);
   t = setTimeout(() => {
@@ -266,78 +226,76 @@ const onFilterDebounced = () => {
   }, 150);
 };
 
-// 生成卡牌图片URL
+// 图片URL生成
 const imageUrl = (card) => {
-  return `${imagesBase}/${card.id}.jpg`; // 匹配你的图片命名规则
+  return `${imagesBase}/${card.id}.jpg`; 
 };
 
-// 打开卡牌详情弹窗
+// 打开详情弹窗
 const openCardDetail = (card) => {
   selectedCard.value = card;
   dialog.value = true;
 };
 
-// 筛选后的卡牌列表（核心计算属性）
+// 筛选逻辑（适配输入框）
 const filteredCards = computed(() => {
   return allCards.value.filter(card => {
-    // 关键词筛选（名称/效果）
+    // 关键词筛选
     const keywordMatch = 
       card.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       (card.eff && card.eff.toLowerCase().includes(searchQuery.value.toLowerCase()));
-
+    
     // 系列筛选
     const seriesMatch = selectedSeries.value ? card.series === selectedSeries.value : true;
-
-    // 颜色筛选（多选）
+    
+    // 颜色筛选
     const colorMatch = selectedColors.value.length > 0 
       ? selectedColors.value.includes(card.color) 
       : true;
+    
+    // 数值筛选（兼容输入框空值）
+    const costMatch = costMin.value === null || costMin.value === '' ? true : card.cost >= costMin.value;
+    const ppMatch = ppMin.value === null || ppMin.value === '' ? true : card.PP >= ppMin.value;
+    const dpMatch = dpMin.value === null || dpMin.value === '' ? true : card.DP >= dpMin.value;
 
-    // 滑块筛选（费用/PP/DP）
-    const costMatch = card.cost >= costMin.value;
-    const ppMatch = card.PP >= ppMin.value;
-    const dpMatch = card.DP >= dpMin.value;
-
-    // 所有条件需同时满足
     return keywordMatch && seriesMatch && colorMatch && costMatch && ppMatch && dpMatch;
   });
 });
 
-// 初始化获取卡牌数据
+// 初始化数据
 onMounted(async () => {
   try {
-    // 从后端API获取数据（替换为你的后端接口）
-    const res = await fetch('/api/search');
-    const data = await res.json();
-    allCards.value = data;
+    // 测试用：手动添加数据（如果后端接口未就绪）
+    allCards.value = [
+      { id: 1, name: '测试卡牌1', series: 'BP01', color: '红', cost: 2, PP: 5, DP: 3, eff: '测试效果1' },
+      { id: 2, name: '测试卡牌2', series: 'BP02', color: '蓝', cost: 3, PP: 7, DP: 4, eff: '测试效果2' }
+    ];
 
-    // 自动识别滑块最大值（可选，根据实际数据动态调整）
-    if (data.length > 0) {
-      sliderMax.value = {
-        cost: Math.max(...data.map(c => c.cost)),
-        pp: Math.max(...data.map(c => c.PP)),
-        dp: Math.max(...data.map(c => c.DP))
-      };
-    }
+    // 真实接口（替换上面的测试数据）
+    // const res = await fetch('/api/search');
+    // const data = await res.json();
+    // allCards.value = data;
 
-    // 提取系列列表（可选，从数据中自动生成）
-    const uniqueSeries = [...new Set(data.map(c => c.series))];
+    // 自动提取系列列表
+    const uniqueSeries = [...new Set(allCards.value.map(c => c.series))];
     seriesList.value = uniqueSeries.map(s => ({ text: s, value: s }));
   } catch (err) {
-    console.error('获取卡牌数据失败：', err);
+    console.error('获取数据失败：', err);
   }
 });
 </script>
 
 <style scoped>
-.v-slider {
-  --v-slider-track-color: #2196f3;
-  --v-slider-thumb-color: #1976d2;
+/* 优化卡片样式 */
+.v-card {
+  transition: transform 0.2s;
+}
+.v-card:hover {
+  transform: translateY(-4px);
 }
 
-/* 可选：给 footer 链接加 hover 效果 */
+/* 链接样式 */
 a {
   text-decoration: none;
-  transition: color 0.2s;
 }
 </style>
