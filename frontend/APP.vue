@@ -1,7 +1,9 @@
 <template>
   <v-app>
+    <!-- 主体内容 -->
     <v-main>
       <v-container fluid class="py-4">
+        <!-- 搜索栏、筛选面板、卡牌网格、弹窗 这些内容保持不变 -->
         <!-- 搜索栏 -->
         <v-card class="mb-4">
           <v-card-text>
@@ -124,7 +126,12 @@
               hover
               @click="openCardDetail(card)"
             >
-            <v-img :src="imageUrl(card)" aspect-ratio="450/629"  <!-- 精确比例 --> max-width="450"         <!-- 限制最大宽度 -->cover></v-img>
+              <v-img 
+                :src="imageUrl(card)" 
+                aspect-ratio="450/629"  
+                max-width="450"         
+                cover
+              ></v-img>
               <v-card-title class="text-center text-truncate">
                 {{ card.name }}
               </v-card-title>
@@ -183,40 +190,40 @@
           </v-card>
         </v-dialog>
       </v-container>
-<!-- 在原APP.vue的v-main之后、v-app结束之前，添加以下v-footer部分 -->
-      <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
-        <v-container fluid>
-          <!-- 免责声明 -->
-          <v-row justify="center" class="mb-2">
-            <v-col cols="12" class="text-center">
-              PCG卡查是一个非官方粉丝工具，所有卡牌资料版权归 Bushiroad (武士道) 所有，本网站与 Bushiroad 并无任何官方合作或授权关系。
-            </v-col>
-          </v-row>
-
-          <!-- 版权+问题反馈 -->
-          <v-row justify="center" class="mb-3">
-            <v-col cols="12" class="text-center">
-              © 2025 PCG卡查. All rights reserved. 
-              <span class="mx-2">|</span>
-              <a href="#" class="text-blue-300 hover:underline">问题反馈</a>
-            </v-col>
-          </v-row>
-
-          <!-- 开发者信息 -->
-          <v-row justify="center" align="center">
-            <v-col cols="12" class="text-center">
-              <v-icon size="16" class="mr-1">mdi-code-tags</v-icon>
-              Developed by [你的开发者名称/团队名]
-              <span class="mx-3">|</span>
-              <v-icon size="16" class="mr-1">mdi-palette</v-icon>
-              [设计/协作方名称（可选）]
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-footer>
     </v-main>
+
+    <!-- 免责声明 Footer：放在 v-main 外面，作为 v-app 的直接子元素 -->
+    <v-footer class="bg-gradient-to-r from-blue-900 to-gray-900 text-lighten-3 py-4">
+      <v-container fluid>
+        <!-- 免责声明 -->
+        <v-row justify="center" class="mb-2">
+          <v-col cols="12" class="text-center">
+            PCG卡查是一个非官方粉丝工具，所有卡牌资料版权归 Bushiroad (武士道) 所有，本网站与 Bushiroad 并无任何官方合作或授权关系。
+          </v-col>
+        </v-row>
+
+        <!-- 版权+问题反馈 -->
+        <v-row justify="center" class="mb-3">
+          <v-col cols="12" class="text-center">
+            © 2025 PCG卡查. All rights reserved. 
+            <span class="mx-2">|</span>
+            <a href="#" class="text-blue-300 hover:underline">问题反馈</a>
+          </v-col>
+        </v-row>
+
+        <!-- 开发者信息 -->
+        <v-row justify="center" align="center">
+          <v-col cols="12" class="text-center">
+            <v-icon size="16" class="mr-1">mdi-code-tags</v-icon>
+            Developed by KuristNiaS
+            <span class="mx-3">|</span>
+            <v-icon size="16" class="mr-1">mdi-palette</v-icon>
+            PCG卡查团队
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-footer>
   </v-app>
-  
 </template>
 
 <script setup>
@@ -232,7 +239,7 @@ const ppMin = ref(0); // PP最小值（滑块）
 const dpMin = ref(0); // DP最小值（滑块）
 const selectedCard = ref(null); // 选中的卡牌详情
 const dialog = ref(false); // 弹窗控制
-const imagesBase = 'https://your-image-base-url.com/images'; // 替换为你的图片基础路径（或后端图片接口）
+const imagesBase = 'https://your-image-base-url.com/images'; // 替换为你的图片基础路径
 
 // 滑块最大值（根据你的卡牌数据调整）
 const sliderMax = ref({
@@ -326,5 +333,11 @@ onMounted(async () => {
 .v-slider {
   --v-slider-track-color: #2196f3;
   --v-slider-thumb-color: #1976d2;
+}
+
+/* 可选：给 footer 链接加 hover 效果 */
+a {
+  text-decoration: none;
+  transition: color 0.2s;
 }
 </style>
