@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <v-app-bar flat color="white">
-      <v-toolbar-title>PCG 卡片库 (Vuetify)</v-toolbar-title>
+      <v-toolbar-title>PCG 卡查 </v-toolbar-title>
       <v-spacer />
       <div class="text-subtitle-2 grey--text">API: {{ apiBase }}</div>
-    </v-app-bar>
+    </v-app-bar>1
 
     <v-container fluid>
       <v-row>
@@ -76,12 +76,7 @@
           <v-row>
             <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
               <v-card class="hoverable" @click="open(card)" outlined>
-                <<v-img 
-                  :src="imageUrl(card)" 
-                  aspect-ratio="450/629"  <!-- 精确比例 -->
-                  max-width="450"         <!-- 限制最大宽度 -->
-                  cover
-                  >
+                <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
                   <template #placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-1" />
@@ -113,7 +108,12 @@
         <v-card-text>
           <v-row>
             <v-col cols="12" md="5">
-              <v-img :src="imageUrl(selectedCard)" aspect-ratio="1.25"></v-img>
+              <v-img 
+              :src="imageUrl(card)" 
+              aspect-ratio="450/629"  <!-- 精确比例 -->
+              max-width="450"         <!-- 限制最大宽度 -->
+              cover
+              ></v-img>
             </v-col>
             <v-col cols="12" md="7">
               <div><strong>ID:</strong> {{ selectedCard?.id }}</div>
@@ -285,7 +285,13 @@ export default {
     // debounce for input
     let t
     function onFilterDebounced(){
-      clearTimeout(t); t = setTimeout(()=>{}, 150)
+      function onFilterDebounced(){
+      clearTimeout(t); 
+      t = setTimeout(()=>{
+    // 触发过滤（计算属性会自动更新，这里可加日志或调试信息）
+      console.log("过滤条件更新");
+      }, 150)
+    }
     }
 
     function sortAndRender(){ /* reactive via computed */ }
