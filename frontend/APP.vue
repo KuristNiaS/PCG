@@ -430,4 +430,4 @@ export default {
 }
 </style>
 
-<!update>
+/* 2024 KuristNiaS 版权所有，遵循 MIT 许可证。 */
