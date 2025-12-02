@@ -408,7 +408,7 @@ export default {
 }
 
 .v-application {
-  background-color: #121212 !important;
+  background-color: #1e242a !important;
 }
 
 </style>
