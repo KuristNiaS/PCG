@@ -76,7 +76,7 @@
           <v-row>
             <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
               <v-card class="hoverable" @click="open(card)" outlined>
-                <v-img :src="imageUrl(card)" height="629" width="450" cover>
+                <v-img :src="imageUrl(card)" height="800" width="450" cover>
                   <template #placeholder>
                     <v-row class="fill-height ma-0" align="center" justify="center">
                       <v-progress-circular indeterminate color="grey lighten-1" />
