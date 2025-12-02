@@ -11,7 +11,7 @@
       <v-container fluid>
         <v-row>
           <!-- filters -->
-          <v-col cols="12" md="3" class="filters-col">
+          <v-col cols="3" md="2" class="filters-col">
             <v-card outlined class="filters-card" elevation="2">
               <v-card-text>
                 <v-text-field v-model="q" label="关键词（名称/效果）" dense @input="onFilterDebounced" />
