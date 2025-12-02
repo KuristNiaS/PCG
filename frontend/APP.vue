@@ -291,18 +291,6 @@ export default {
     }
 
     // debounce for input
-// 修正前（错误，嵌套函数）
-let t
-function onFilterDebounced(){
-  function onFilterDebounced(){
-  clearTimeout(t); 
-  t = setTimeout(()=>{
-    console.log("过滤条件更新");
-  }, 150)
-  }
-}
-
-// 修正后（正确）
 let t
 function onFilterDebounced(){
   clearTimeout(t); 
