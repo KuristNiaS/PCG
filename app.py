@@ -41,7 +41,7 @@ def search(
     max_cost: Optional[int] = None,
     min_PP: Optional[int] = None,
     max_PP: Optional[int] = None,
-    limit: int = 50,
+    limit: int = 10000,
     offset: int = 0,
     db=Depends(get_db)
 ):

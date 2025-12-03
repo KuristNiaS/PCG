@@ -195,7 +195,7 @@ export default {
     const maxCost = ref(null)
     const ppValue = ref(null) // 精确匹配的PP值
     const dpValue = ref(null) // 精确匹配的DP值
-    const sortBy = ref('id_desc')
+    const sortBy = ref('id_asc')
 
     const dialog = ref(false)
     const selectedCard = ref(null)
