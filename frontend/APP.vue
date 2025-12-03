@@ -86,7 +86,7 @@
             </v-row>
 
             <v-row>
-              <v-col v-for="card in filtered" :key="card.id" cols="12" sm="6" md="4" lg="3">
+              <v-col v-for="card in filtered" :key="card.id" cols="3" sm="3" md="2" lg="2">
                 <v-card class="hoverable" @click="open(card)" outlined>
                   <v-img :src="imageUrl(card)" height="auto" aspect-ratio="4/3" cover>
                     <template #placeholder>
